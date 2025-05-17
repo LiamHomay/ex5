@@ -73,9 +73,9 @@ void WatchPlaylists(Playlist *p, int count) {
     // If user selects a valid playlist
     if (choice1 != count + 1){
         int choice2;
+        printf("playlist %s:\n", p[choice1- 1].name);
         do {
             // Show playlist options menu
-            printf("playlist %s:\n", p[choice1- 1].name);
             printf("\t1. Show Playlist\n\t2. Add Song\n\t3. Delete Song\n\t4. Sort\n\t5. Play\n\t6. exit\n");
             scanf("%d", &choice2);
 
@@ -107,47 +107,81 @@ void WatchPlaylists(Playlist *p, int count) {
                     // Add a new song to the playlist
                     printf("Enter song's details:\n");
 
-                    char title[100];
-                    char artist[100];
-                    int year;
-                    char lyrics[1000];
-                    int streams;
+                    char *title = NULL;
+                    char *artist = NULL;
+                    char *lyrics = NULL;
+                    int year, streams;
+                    int size = 0;
+                    char ch;
 
+                    // ====== Title ======
                     printf("Title:\n");
-                    scanf(" %[^\n]", title);
+                    size = 0;
+                    scanf("%*c");
+                    while (1) {
+                        scanf("%c", &ch);
+                        if (ch == '\n') break;
+                        title = realloc(title, size + 1);
+                        if (title == NULL) exit(1);
+                        title[size++] = ch;
+                    }
+                    title = realloc(title, size + 1);
+                    if (title == NULL) exit(1);
+                    title[size] = '\0';
 
+                    // ====== Artist ======
                     printf("Artist:\n");
-                    scanf(" %[^\n]", artist);
+                    artist = NULL;
+                    size = 0;
+                    scanf("%*c");
+                    while (1) {
+                        scanf("%c", &ch);
+                        if (ch == '\n') break;
+                        artist = realloc(artist, size + 1);
+                        if (artist == NULL) exit(1);
+                        artist[size++] = ch;
+                    }
+                    artist = realloc(artist, size + 1);
+                    if (artist == NULL) exit(1);
+                    artist[size] = '\0';
 
+                    // ====== Year ======
                     printf("Year of release:\n");
-                    scanf("%d", &year);
+                    scanf("%d%*c", &year);
 
+
+                    // ====== Lyrics ======
                     printf("Lyrics:\n");
-                    scanf(" %[^\n]", lyrics);
+                    lyrics = NULL;
+                    size = 0;
+                    scanf("%*c");
+                    while (1) {
+                        scanf("%c", &ch);
+                        if (ch == '\n') break;
+                        lyrics = realloc(lyrics, size + 1);
+                        if (lyrics == NULL) exit(1);
+                        lyrics[size++] = ch;
+                    }
+                    lyrics = realloc(lyrics, size + 1);
+                    if (lyrics == NULL) exit(1);
+                    lyrics[size] = '\0';
 
-                    printf("Streams:\n");
-                    scanf("%d", &streams);
 
                     // Reallocate memory for songs array
                     p[choice1 - 1].songs = realloc(p[choice1 - 1].songs, sizeof(Song *) * (p[choice1 - 1].songsNum + 1));
                     if (p[choice1 - 1].songs == NULL) exit(1);
 
-                    // Allocate and copy new song data
-                    p[choice1 - 1].songs[p[choice1 - 1].songsNum] = malloc(sizeof(Song));
-                    if (p[choice1 - 1].songs[p[choice1 - 1].songsNum] == NULL) exit(1);
+                    // Allocate and assign song
+                    Song *newSong = malloc(sizeof(Song));
+                    if (newSong == NULL) exit(1);
 
-                    p[choice1 - 1].songs[p[choice1 - 1].songsNum]->title = malloc(strlen(title) + 1);
-                    strcpy(p[choice1 - 1].songs[p[choice1 - 1].songsNum]->title, title);
+                    newSong->title = title;
+                    newSong->artist = artist;
+                    newSong->lyrics = lyrics;
+                    newSong->year = year;
+                    newSong->streams = 0;
 
-                    p[choice1 - 1].songs[p[choice1 - 1].songsNum]->artist = malloc(strlen(artist) + 1);
-                    strcpy(p[choice1 - 1].songs[p[choice1 - 1].songsNum]->artist, artist);
-
-                    p[choice1 - 1].songs[p[choice1 - 1].songsNum]->lyrics = malloc(strlen(lyrics) + 1);
-                    strcpy(p[choice1 - 1].songs[p[choice1 - 1].songsNum]->lyrics, lyrics);
-
-                    p[choice1 - 1].songs[p[choice1 - 1].songsNum]->year = year;
-                    p[choice1 - 1].songs[p[choice1 - 1].songsNum]->streams = streams;
-
+                    p[choice1 - 1].songs[p[choice1 - 1].songsNum] = newSong;
                     p[choice1 - 1].songsNum++;
 
                     break;
@@ -212,7 +246,6 @@ void WatchPlaylists(Playlist *p, int count) {
                         case 3:
                             cmpFunc = cmpByStreamsDesc;
                             break;
-                        case 4:
                         default:
                             cmpFunc = cmpAlphabetical;
                     }
@@ -257,11 +290,26 @@ int main() {
                 p = realloc(p, sizeof(Playlist) * (count + 1));
                 if (p == NULL) exit(1);
 
-                p[count].name = malloc(sizeof(char) * 100);
-                if (p[count].name == NULL) exit(1);
+                char *name = NULL;
+                int size = 0;
+                char ch;
 
-                scanf("%99s", p[count].name);
+                scanf("%*c");
+                while (1) {
+                    scanf("%c", &ch);
+                    if (ch == '\n') break;
 
+                    name = realloc(name, size + 1);
+                    if (name == NULL) exit(1);
+                    name[size] = ch;
+                    size++;
+                }
+
+                name = realloc(name, size + 1); // To add \0
+                if (name == NULL) exit(1);
+                name[size] = '\0';
+
+                p[count].name = name;
                 p[count].songs = NULL;
                 p[count].songsNum = 0;
 
