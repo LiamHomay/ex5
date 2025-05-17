@@ -1,3 +1,9 @@
+/******************
+Name: Liam Homay
+ID: 333087807
+Assignment: ex5
+*******************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,35 +22,242 @@ typedef struct Playlist {
     int songsNum;
 } Playlist;
 
-// Below are some recommendations for functions, you may implement however you want
 
-void deleteSong() {
-
-    printf("Song deleted successfully.\n");
+int cmpByYear(Song *a, Song *b) {
+    return a->year - b->year;
 }
 
-void playSong() {
-    
+int cmpByStreamsAsc(Song *a, Song *b) {
+    return a->streams - b->streams;
 }
 
-void freeSong() {
-
+int cmpByStreamsDesc(Song *a, Song *b) {
+    return b->streams - a->streams;
 }
 
-void freePlaylist(P) {
-    
+int cmpAlphabetical(Song *a, Song *b) {
+    return strcmp(a->title, b->title);
 }
+
+void sort(Song **arr, int n, int (*cmp)(Song *, Song *)) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (cmp(arr[j], arr[j + 1]) > 0) {
+                Song *temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+}
+
 
 void printPlaylistsMenu() {
-    printf("Please Choose:\n"); 
-    printf("\t1. Watch playlists\n\t2. Add playlist\n\t3. Remove playlist\n\t4. exit\n");   
+    printf("Please Choose:\n");
+    printf("\t1. Watch playlists\n\t2. Add playlist\n\t3. Remove playlist\n\t4. exit\n");
 }
 
 void sortPlaylist() {
-    
+
     printf("sorted\n");
 }
 
+void  WatchPlaylists(Playlist *p, int count) {
+    printf("Choose a playlist:\n");
+    for(int i = 0; i < count; i++) {
+        printf("\t%d. %s\n", i + 1, p[i].name);
+    }
+    printf("\t%d. Back to main menu\n", count);
+
+    int choice1;
+    scanf("%d", &choice1);
+
+    if (choice1 != count + 1){
+        int choice2;
+        do {
+            printf("playlist %s:\n", p[choice1- 1].name);
+            printf("\t1. Show Playlist\n\t2. Add Song\n\t3. Delete Song\n\t4. Sort\n\t5. Play\n\t6. exit\n");
+            scanf("%d", &choice2);
+
+            switch (choice2) {
+                case 1:
+                    for (int i = 0; i < p[choice1 - 1].songsNum; i++) {
+                        printf("%d. Title: %s\n", i + 1, p[choice1 - 1].songs[i]->title);
+                        printf("    Artist: %s\n", p[choice1 - 1].songs[i]->artist);
+                        printf("    Released: %d\n", p[choice1 - 1].songs[i]->year);
+                        printf("    Streams: %d\n", p[choice1 - 1].songs[i]->streams);
+                    }
+
+                    int choice3;
+                    do {
+                        printf("choose a song to play, or 0 to quit:\n");
+                        scanf("%d", &choice3);
+
+                        if (p[choice1 - 1].songsNum == 0) break;
+                        printf("Now playing %s:\n", p[choice1 - 1].songs[choice3 - 1]->title);
+                        printf("$ %s $\n", p[choice1 - 1].songs[choice3 - 1]->lyrics);
+                        p[choice1 - 1].songs[choice3 - 1]->streams++;
+                        printf("choose a song to play, or 0 to quit:");
+                        scanf("%d", &choice3);
+                    }while(choice3 != 0);
+                    break;
+                case 2:
+                    //ToDo
+                    //Add Song
+                    break;
+                case 3:
+                    for (int i = 0; i < p[choice1 - 1].songsNum; i++) {
+                        printf("%d. Title: %s\n", i + 1, p[choice1 - 1].songs[i]->title);
+                        printf("    Artist: %s\n", p[choice1 - 1].songs[i]->artist);
+                        printf("    Released: %d\n", p[choice1 - 1].songs[i]->year);
+                        printf("    Streams: %d\n", p[choice1 - 1].songs[i]->streams);
+                    }
+
+                    int choice4;
+                    printf("choose a song to delete, or 0 to quit:\n");
+                    scanf("%d", &choice4);
+                    if (choice4 == 0) break;
+
+                    free(p[choice1 - 1].songs[choice4 - 1]->title);
+                    free(p[choice1 - 1].songs[choice4 - 1]->artist);
+                    free(p[choice1 - 1].songs[choice4 - 1]->lyrics);
+                    free(p[choice1 - 1].songs[choice4 - 1]);
+
+                    for (int i = choice4 - 1; i < p[choice1 - 1].songsNum - 1; i++) {
+                        p[choice1 - 1].songs[i] = p[choice1 - 1].songs[i + 1];
+                    }
+
+                    p[choice1 - 1].songsNum--;
+
+                    if (p[choice1 - 1].songsNum == 0) {
+                        free(p[choice1 - 1].songs);
+                        p[choice1 - 1].songs = NULL;
+                    }
+                    else {
+                        p[choice1 - 1].songs = realloc(p[choice1 - 1].songs,
+                            sizeof(Song *) * p[choice1 - 1].songsNum);
+                        if (!p[choice1 - 1].songs) exit(1);
+                    }
+
+                    printf("song deleted successfully.\n");
+                    break;
+                case 4:
+                    printf("choose:\n");
+                    printf("1. sort by year\n");
+                    printf("2. sort by streams - ascending order\n");
+                    printf("3. sort by streams - descending order\n");
+                    printf("4. sort alphabetically\n");
+
+                    int choice5;
+                    scanf("%d", &choice5);
+
+                    int (*cmpFunc)(Song *, Song *);
+                    switch (choice5) {
+                        case 1:
+                            cmpFunc = cmpByYear;
+                            break;
+                        case 2:
+                            cmpFunc = cmpByStreamsAsc;
+                            break;
+                        case 3:
+                            cmpFunc = cmpByStreamsDesc;
+                            break;
+                        case 4:
+                        default:
+                            cmpFunc = cmpAlphabetical;
+                    }
+
+                    sort(p[choice1 - 1].songs, p[choice1 - 1].songsNum, cmpFunc);
+                    break;
+                case 5:
+                    for (int i = 0; i < p[choice1 - 1].songsNum; i++) {
+                        printf("Now playing %s:\n", p[choice1 - 1].songs[i]->title);
+                        printf("$ %s $\n", p[choice1 - 1].songs[i]->lyrics);
+                        printf("\n");
+                        p[choice1 - 1].songs[i]->streams++;
+                    }
+                    break;
+                case 6:
+                    break;
+                default:
+                    printf("Invalid option\n");
+            }
+        }while(choice2 != 6);
+    }
+}
+
 int main() {
-    printf("Goodbye!\n");  
+    int count = 0;
+    Playlist *p = NULL;
+
+    int choice;
+    do {
+        printPlaylistsMenu();
+        scanf("%d", &choice);
+        switch (choice) {
+            case 1:
+                WatchPlaylists(p, count);
+                break;
+            case 2:
+                //ToDo
+                //Add Playlist
+            case 3:
+                printf("Choose a playlist:\n");
+                for(int i = 0; i < count; i++) {
+                    printf("\t%d. %s\n", i + 1, p[i].name);
+                }
+                printf("\t%d. Back to main menu\n", count + 1);
+
+                int choice2;
+                scanf("%d", &choice2);
+
+                if (choice2 == count + 1) break;
+
+                for (int i = 0; i < p[choice2 - 1].songsNum; i++) {
+                    free(p[choice2 - 1].songs[i]->title);
+                    free(p[choice2 - 1].songs[i]->artist);
+                    free(p[choice2 - 1].songs[i]->lyrics);
+                    free(p[choice2 - 1].songs[i]);
+                }
+                free(p[choice2 - 1].songs);
+                free(p[choice2 - 1].name);
+
+                for (int i = choice2 - 1; i < count - 1; i++) {
+                    p[i] = p[i + 1];
+                }
+
+                count--;
+
+                if (count == 0) {
+                    free(p);
+                    p = NULL;
+                } else {
+                    p = realloc(p, sizeof(Playlist) * (count - 1));
+                    if (p == NULL) exit(1);
+                }
+
+                printf("playlist deleted.\n");
+                break;
+            case 4:
+                break;
+            default:
+                printf("Invalid option\n");
+        }
+    }while(choice != 4);
+    printf("Goodbye!\n");
+
+    if (p != NULL) {
+        for (int i = 0; i < count; i++) {
+            for (int j = 0; j < p[i].songsNum; j++) {
+                free(p[i].songs[j]->title);
+                free(p[i].songs[j]->artist);
+                free(p[i].songs[j]->lyrics);
+                free(p[i].songs[j]);
+            }
+            free(p[i].songs);
+            free(p[i].name);
+        }
+        free(p);
+    }
+    return 0;
 }
