@@ -23,19 +23,19 @@ typedef struct Playlist {
 } Playlist;
 
 // Comparison functions for sorting songs
-int cmpByYear(Song *a, Song *b) {
+int cmpByYear(const Song *a, const Song *b) {
     return a->year - b->year;
 }
 
-int cmpByStreamsAsc(Song *a, Song *b) {
+int cmpByStreamsAsc(const Song *a, const Song *b) {
     return a->streams - b->streams;
 }
 
-int cmpByStreamsDesc(Song *a, Song *b) {
+int cmpByStreamsDesc(const Song *a, const Song *b) {
     return b->streams - a->streams;
 }
 
-int cmpAlphabetical(Song *a, Song *b) {
+int cmpAlphabetical(const Song *a, const Song *b) {
     return strcmp(a->title, b->title);
 }
 
@@ -87,6 +87,7 @@ void WatchPlaylists(Playlist *p, int count) {
                         printf("    Artist: %s\n", p[choice1 - 1].songs[i]->artist);
                         printf("    Released: %d\n", p[choice1 - 1].songs[i]->year);
                         printf("    Streams: %d\n", p[choice1 - 1].songs[i]->streams);
+                        printf("\n");
                     }
 
                     // Let user choose a song to play, or quit
@@ -110,7 +111,7 @@ void WatchPlaylists(Playlist *p, int count) {
                     char *title = NULL;
                     char *artist = NULL;
                     char *lyrics = NULL;
-                    int year, streams;
+                    int year;
                     int size = 0;
                     char ch;
 
@@ -133,7 +134,6 @@ void WatchPlaylists(Playlist *p, int count) {
                     printf("Artist:\n");
                     artist = NULL;
                     size = 0;
-                    scanf("%*c");
                     while (1) {
                         scanf("%c", &ch);
                         if (ch == '\n') break;
@@ -147,7 +147,7 @@ void WatchPlaylists(Playlist *p, int count) {
 
                     // ====== Year ======
                     printf("Year of release:\n");
-                    scanf("%d%*c", &year);
+                    scanf("%d", &year);
 
 
                     // ====== Lyrics ======
@@ -192,6 +192,7 @@ void WatchPlaylists(Playlist *p, int count) {
                         printf("    Artist: %s\n", p[choice1 - 1].songs[i]->artist);
                         printf("    Released: %d\n", p[choice1 - 1].songs[i]->year);
                         printf("    Streams: %d\n", p[choice1 - 1].songs[i]->streams);
+                        printf("\n");
                     }
 
                     int choice4;
@@ -222,7 +223,7 @@ void WatchPlaylists(Playlist *p, int count) {
                         if (!p[choice1 - 1].songs) exit(1);
                     }
 
-                    printf("song deleted successfully.\n");
+                    printf("Song deleted successfully.\n");
                     break;
                 case 4:
                     // Sort songs with user's chosen criteria
@@ -262,7 +263,7 @@ void WatchPlaylists(Playlist *p, int count) {
                     }
                     break;
                 case 6:
-                    // Exit playlist menu
+                    WatchPlaylists(p, count);
                     break;
                 default:
                     printf("Invalid option\n");
