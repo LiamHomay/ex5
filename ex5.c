@@ -23,19 +23,19 @@ typedef struct Playlist {
 } Playlist;
 
 // Comparison functions for sorting songs
-int cmpByYear(const Song *a, const Song *b) {
+int cmpByYear(Song *a, Song *b) {
     return a->year - b->year;
 }
 
-int cmpByStreamsAsc(const Song *a, const Song *b) {
+int cmpByStreamsAsc(Song *a, Song *b) {
     return a->streams - b->streams;
 }
 
-int cmpByStreamsDesc(const Song *a, const Song *b) {
+int cmpByStreamsDesc(Song *a, Song *b) {
     return b->streams - a->streams;
 }
 
-int cmpAlphabetical(const Song *a, const Song *b) {
+int cmpAlphabetical(Song *a, Song *b) {
     return strcmp(a->title, b->title);
 }
 
@@ -60,7 +60,7 @@ void printPlaylistsMenu() {
 }
 
 // Function to manage user interaction with playlists
-void WatchPlaylists(Playlist *p, int count) {
+void watchPlaylists(Playlist *p, int count) {
     printf("Choose a playlist:\n");
     for(int i = 0; i < count; i++) {
         printf("\t%d. %s\n", i + 1, p[i].name);
@@ -106,7 +106,7 @@ void WatchPlaylists(Playlist *p, int count) {
                     break;
                 case 2:
                     // Add a new song to the playlist
-                    printf("Enter song's details:\n");
+                    printf("Enter song's details\n");
 
                     char *title = NULL;
                     char *artist = NULL;
@@ -263,7 +263,7 @@ void WatchPlaylists(Playlist *p, int count) {
                     }
                     break;
                 case 6:
-                    WatchPlaylists(p, count);
+                    watchPlaylists(p, count);
                     break;
                 default:
                     printf("Invalid option\n");
@@ -282,7 +282,7 @@ int main() {
         scanf("%d", &choice);
         switch (choice) {
             case 1:
-                WatchPlaylists(p, count);
+                watchPlaylists(p, count);
                 break;
             case 2:
                 // Add a new playlist
@@ -355,7 +355,7 @@ int main() {
                     if (p == NULL) exit(1);
                 }
 
-                printf("playlist deleted.\n");
+                printf("Playlist deleted.\n");
                 break;
             case 4:
                 // Exit program
